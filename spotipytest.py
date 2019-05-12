@@ -1,17 +1,33 @@
-import sys
 import spotipy
-import spotipy.util as util
+import spotipy.oauth2 as oauth2
 
-util.prompt_for_user_token(username,scope,client_id=SPOTIPY_CLIENT_ID,client_secret=SPOTIPY_CLIENT_SECRET,redirect_uri=http://localhost:8080)
+credentials = oauth2.SpotifyClientCredentials(
+        client_id='bc0780e21dee47309a4789d08e52e0da',
+        client_secret='707c58cee7c24455b7ec4496ba2d9bd8')
 
-birdy_uri = 'spotify:artist:2WX2uTcsvV5OnS0inACecP'
-spotify = spotipy.Spotify()
+token = credentials.get_access_token()
+spotify = spotipy.Spotify(auth=token)
 
-results = spotify.artist_albums(birdy_uri, album_type='album')
-albums = results['items']
-while results['next']:
-    results = spotify.next(results)
-    albums.extend(results['items'])
+name = 'Ed Sheeran'
 
-for album in albums:
-    print(album['name'])
+results = spotify.search(name)
+
+#Extract Ed Sheeran's artist uri (ID)
+artist_uri = results['tracks']['items'][0]['artists'][0]['uri']
+
+#Pull up all of Ed Sheeran's albums
+edsheeran_albums = spotify.artist_albums(artist_uri, album_type = 'album')
+
+album_names = []
+album_uris = []
+for i in range(len(edsheeran_albums['items'])):
+	album_names.append(edsheeran_albums['items'][i]['name'])
+	album_uris.append(edsheeran_albums['items'][i]['uri'])
+
+print "album names: ", album_names, "\n"
+print "album uris: ",album_uris
+
+
+def albumSongs(uri):
+	album = uri
+	
